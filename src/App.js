@@ -119,7 +119,7 @@ function MovieList() {
   return (
     <ul className="list">
       {movies?.map((movie) => (
-        <Movie movie={movie} />
+        <Movie movie={movie} key={movie.Title} />
       ))}
     </ul>
   );
@@ -195,7 +195,7 @@ function WatchedList({ watched }) {
   return (
     <ul className="list">
       {watched.map((movie) => (
-        <WatchedMovie movie={movie} />
+        <WatchedMovie movie={movie} key={movie.Title} />
       ))}
     </ul>
   );
