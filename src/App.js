@@ -52,20 +52,31 @@ const average = (arr) =>
 
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState(tempWatchedData);
   return (
     <>
-      <NavigationBar movies={movies} />
-      <Main movies={movies} />
+      <NavigationBar>
+        <Results movies={movies} />
+      </NavigationBar>
+      <Main>
+        <Box>
+          <MovieList movies={movies} />
+        </Box>
+        <Box>
+          <Summary watched={watched} />
+          <WatchedList watched={watched} />
+        </Box>
+      </Main>
     </>
   );
 }
 
-function NavigationBar({ movies }) {
+function NavigationBar({ children }) {
   return (
     <nav className="nav-bar">
       <Logo />
       <Search />
-      <Results movies={movies} />
+      {children}
     </nav>
   );
 }
@@ -96,25 +107,21 @@ function Results({ movies }) {
     </p>
   );
 }
-function Main({ movies }) {
-  return (
-    <main className="main">
-      <ListBox movies={movies} />
-      <WatchedBox />
-    </main>
-  );
+function Main({ children }) {
+  return <main className="main">{children}</main>;
 }
 
-function ListBox({ movies }) {
-  const [isOpen1, setIsOpen1] = useState(true);
+function Box({ children }) {
+  const [isOpen, setIsOpen] = useState(true);
 
   return (
     <div className="box">
-      <Button isOpen={isOpen1} setIsOpen={setIsOpen1} />
-      {isOpen1 && <MovieList movies={movies} />}
+      <Button isOpen={isOpen} setIsOpen={setIsOpen} />
+      {isOpen && children}
     </div>
   );
 }
+
 function MovieList({ movies }) {
   return (
     <ul className="list">
@@ -145,23 +152,23 @@ function Button({ isOpen, setIsOpen }) {
     </button>
   );
 }
-function WatchedBox({ movies }) {
-  const [watched, setWatched] = useState(tempWatchedData);
+// function WatchedBox({ movies }) {
+//
 
-  const [isOpen2, setIsOpen2] = useState(true);
+//   const [isOpen2, setIsOpen2] = useState(true);
 
-  return (
-    <div className="box">
-      <Button isOpen={isOpen2} setIsOpen={setIsOpen2} />
-      {isOpen2 && (
-        <>
-          <Summary watched={watched} />
-          <WatchedList watched={watched} />
-        </>
-      )}
-    </div>
-  );
-}
+//   return (
+//     <div className="box">
+//       <Button isOpen={isOpen2} setIsOpen={setIsOpen2} />
+//       {isOpen2 && (
+//         <>
+//           <Summary watched={watched} />
+//           <WatchedList watched={watched} />
+//         </>
+//       )}
+//     </div>
+//   );
+// }
 function Summary({ watched }) {
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
   const avgUserRating = average(watched.map((movie) => movie.userRating));
