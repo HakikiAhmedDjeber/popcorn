@@ -59,21 +59,13 @@ export default function App() {
         <Results movies={movies} />
       </NavigationBar>
       <Main>
-        <Box element={<MovieList movies={movies} />} />
-        <Box
-          element={
-            <>
-              <Summary watched={watched} />
-              <WatchedList watched={watched} />
-            </>
-          }
-        />
-        {/* <Box>
+        <Box>
           <MovieList movies={movies} />
         </Box>
         <Box>
-          
-        </Box> */}
+          <Summary watched={watched} />
+          <WatchedList watched={watched} />
+        </Box>
       </Main>
     </>
   );
@@ -119,13 +111,13 @@ function Main({ children }) {
   return <main className="main">{children}</main>;
 }
 
-function Box({ element }) {
+function Box({ children }) {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
     <div className="box">
       <Button isOpen={isOpen} setIsOpen={setIsOpen} />
-      {isOpen && element}
+      {isOpen && children}
     </div>
   );
 }
