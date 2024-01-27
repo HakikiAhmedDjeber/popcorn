@@ -46,10 +46,11 @@ const tempWatchedData = [
     userRating: 9,
   },
 ];
-const KEY = "af03f5ca";
+
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
-const query = "ronaldo";
+const query = "omar";
+const KEY = "af03f5ca";
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
@@ -68,10 +69,13 @@ export default function App() {
           throw new Error("something went wrong with fetching movies!");
 
         const data = await res.json();
+
+        if (data.Response === "False") throw new Error("movie not found");
         setMovies(data.Search);
-        setIsLoading(false);
       } catch (err) {
         setError(err.message);
+      } finally {
+        setIsLoading(false);
       }
     }
     getMovies();
@@ -97,9 +101,9 @@ export default function App() {
   );
 }
 
-function ErrorMessage(message) {
+function ErrorMessage({ message }) {
   return (
-    <p>
+    <p className="error">
       <span>⛔</span>
       {message}
     </p>
