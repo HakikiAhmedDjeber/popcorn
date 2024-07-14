@@ -77,12 +77,15 @@ export default function App() {
 
   useEffect(
     function () {
+      const controller = new AbortController();
+
       async function getMovies() {
         try {
           setError(false);
           setIsLoading(true);
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
           );
 
           if (!res.ok)
@@ -93,7 +96,9 @@ export default function App() {
           if (data.Response === "False") throw new Error("movie not found");
           setMovies(data.Search);
         } catch (err) {
-          setError(err.message);
+          if (err.name !== "AbortError") {
+            setError(err.message);
+          }
         } finally {
           setIsLoading(false);
         }
@@ -104,6 +109,12 @@ export default function App() {
         return;
       }
       getMovies();
+
+      // clean up fetch function
+
+      return () => {
+        controller.abort();
+      };
     },
     [query]
   );
@@ -362,6 +373,30 @@ function MovieDetails({ selectedId, onCloseId, onAddWatched, watchedMovies }) {
     getMovieDetails();
   }, [selectedId]);
 
+  useEffect(() => {
+    if (!title) return;
+    document.title = `Movie | ${title}`;
+
+    return () => {
+      document.title = "usePopcorn";
+      console.log(`clean up effect for movie ${title}`);
+    };
+  }, [title]);
+
+  useEffect(() => {
+    function close(e) {
+      if (e.code === "Escape") {
+        onCloseId();
+        console.log("CLOSING");
+      }
+    }
+
+    document.addEventListener("keydown", close);
+
+    return function () {
+      document.removeEventListener("keydown", close);
+    };
+  }, [onCloseId]);
   return (
     <div className="details">
       {isLoading ? (
