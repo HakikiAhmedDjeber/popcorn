@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
 const tempMovieData = [
   {
@@ -195,6 +195,23 @@ function Logo() {
   );
 }
 function Search({ query, setQuery }) {
+  const inputEl = useRef(null);
+
+  useEffect(() => {
+    function callback(e) {
+      if (e.code === "Enter") {
+        if (document.activeElement === inputEl.current) return;
+        inputEl.current.focus();
+        setQuery("");
+      }
+    }
+
+    document.addEventListener("keydown", callback);
+
+    // cleanUp effect
+    return () => document.removeEventListener("keydown", callback);
+  }, [setQuery]);
+
   return (
     <input
       className="search"
@@ -202,6 +219,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputEl}
     />
   );
 }
@@ -329,6 +347,12 @@ function MovieDetails({ selectedId, onCloseId, onAddWatched, watchedMovies }) {
   const [isLoading, setIsLoading] = useState();
   const [rate, setRate] = useState(0);
 
+  const countRef = useRef("");
+
+  useEffect(() => {
+    if (rate) countRef.current++;
+  }, [rate]);
+
   const isWatched = watchedMovies
     .map((movie) => movie.imdbID)
     .includes(selectedId);
@@ -363,6 +387,7 @@ function MovieDetails({ selectedId, onCloseId, onAddWatched, watchedMovies }) {
       poster,
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ").at(0)),
+      countRatingDecision: countRef.current,
     };
 
     onAddWatched(newWatchedMovie);
@@ -466,7 +491,7 @@ function WatchedMovie({ movie, onDeleteWatched }) {
   return (
     <li key={movie.imdbID}>
       <img src={movie.poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
+      <h3>{movie.title}</h3>
       <div>
         <p>
           <span>⭐️</span>
